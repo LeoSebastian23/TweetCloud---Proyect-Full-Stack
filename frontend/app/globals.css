@@ -2,10 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  :root {
+    --mountain-meadow-50: #edfcf5;
+    --mountain-meadow-100: #d4f7e5;
+    --mountain-meadow-200: #adedd0;
+    --mountain-meadow-300: #77deb5;
+    --mountain-meadow-400: #40c796;
+    --mountain-meadow-500: #20bc88;
+    --mountain-meadow-600: #108b65;
+    --mountain-meadow-700: #0d6f53;
+    --mountain-meadow-800: #0d5843;
+    --mountain-meadow-900: #0c4838;
+    --mountain-meadow-950: #052920;
+  }
 
 @media (prefers-color-scheme: dark) {
   :root {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Link from "next/link";
+
 
 
 export const metadata: Metadata = {
@@ -16,18 +16,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="">
-        <header className="bg-emerald-800 text-white py-4 px-6">
-          <nav className="container mx-auto flex justify-between items-center">
-            <h1 className="text-xl font-bold">TweetCloud</h1>
-            <div className="space-x-4">
-              <Link href="/" className="hover:underline">Inicio</Link>
-              <Link href="/login" className="hover:underline">Iniciar Sesión</Link>
-              <Link href="/register" className="hover:underline">Registrarse</Link>
-            </div>
-          </nav>
-        </header>
-
-        <main className="container mx-auto py-6">{children}</main>
+        <main className=" 
+        mx-auto">{children}</main>
       </body>
     </html>
   );

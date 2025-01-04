@@ -9,8 +9,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        mountainMeadow: {
+          50: 'var(--mountain-meadow-50)',
+          100: 'var(--mountain-meadow-100)',
+          200: 'var(--mountain-meadow-200)',
+          300: 'var(--mountain-meadow-300)',
+          400: 'var(--mountain-meadow-400)',
+          500: 'var(--mountain-meadow-500)',
+          600: 'var(--mountain-meadow-600)',
+          700: 'var(--mountain-meadow-700)',
+          800: 'var(--mountain-meadow-800)',
+          900: 'var(--mountain-meadow-900)',
+          950: 'var(--mountain-meadow-950)',
+        },
       },
     },
   },
