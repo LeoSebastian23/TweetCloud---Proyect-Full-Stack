@@ -4,21 +4,32 @@ import User from '../models/User.js';
 
 // Crear una nueva publicación
 export const crearPublicacion = async (req, res) => {
-  const { titulo, cuerpo } = req.body;
-  const usuarioId = req.userId; // Este valor debe ser parte de un sistema de autenticación
-
   try {
-    const nuevoPost = new Post({
-      titulo,
-      cuerpo,
-      autor: usuarioId, // Relacionar el post con el usuario autenticado
+    const { title, body, autor } = req.body;
+
+    // Verificar que el campo 'autor' esté presente
+    if (!autor) {
+      return res.status(400).json({ message: 'El campo "autor" es obligatorio.' });
+    }
+
+    // Verificar que el usuario existe
+    const user = await User.findById(autor);
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Crear la publicación
+    const newPost = new Post({
+      title,
+      body,
+      autor,
     });
 
-    await nuevoPost.save();
-    res.status(201).json({ mensaje: 'Publicación creada exitosamente', post: nuevoPost });
+    await newPost.save();
+    res.status(201).json(newPost);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Hubo un error al crear la publicación' });
+    console.error(error); // Esto muestra el error en la consola del servidor
+    res.status(500).json({ message: 'Error al crear la publicación', error: error.message });
   }
 };
 

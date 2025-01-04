@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import { connectDB } from './config/db.js';
 import { userRouter } from './routes/UserRoutes.js';
 import { postRouter } from './routes/postRoutes.js';
@@ -11,6 +12,7 @@ connectDB();     // Conecta a MongoDB
 const app = express();
 
 app.use(express.json()); // Para parsear JSON en el cuerpo de las solicitudes
+app.use(cors());
 
 // Rutas
 app.use('/user', userRouter);
