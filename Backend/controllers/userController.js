@@ -3,18 +3,18 @@ import bcrypt from 'bcryptjs';
 
 // Crear un nuevo usuario
 export const crearUsuario = async (req, res) => {
-  const { nombre, email, contraseña, imagenPerfil } = req.body;
+  const { name, email, password, imageProfile } = req.body; // Cambio a los campos solicitados
 
   try {
     // Encriptar la contraseña
     const salt = await bcrypt.genSalt(10);
-    const contraseñaEncriptada = await bcrypt.hash(contraseña, salt);
+    const contraseñaEncriptada = await bcrypt.hash(password, salt); // Cambiar 'contraseña' por 'password'
 
     const nuevoUsuario = new User({
-      nombre,
+      name,
       email,
-      contraseña: contraseñaEncriptada,
-      imagenPerfil: imagenPerfil || 'default-profile.png',
+      password: contraseñaEncriptada,
+      profileImage: imageProfile || 'default-profile.png', // Cambio de 'profileImage'
     });
 
     await nuevoUsuario.save();
@@ -27,7 +27,7 @@ export const crearUsuario = async (req, res) => {
 
 // Autenticación (login) de un usuario
 export const loginUsuario = async (req, res) => {
-  const { email, contraseña } = req.body;
+  const { email, password } = req.body; // Cambio a 'password'
 
   try {
     const usuario = await User.findOne({ email });
@@ -37,7 +37,7 @@ export const loginUsuario = async (req, res) => {
     }
 
     // Verificar la contraseña
-    const esValido = await bcrypt.compare(contraseña, usuario.contraseña);
+    const esValido = await bcrypt.compare(password, usuario.password); // Cambiar 'contraseña' por 'password'
 
     if (!esValido) {
       return res.status(400).json({ error: 'Contraseña incorrecta' });
@@ -50,11 +50,10 @@ export const loginUsuario = async (req, res) => {
   }
 };
 
-
 // Obtener todos los usuarios
 export const obtenerUsuarios = async (req, res) => {
   try {
-    const usuarios = await User.find({}, '-contraseña'); // Excluir la contraseña por seguridad
+    const usuarios = await User.find({}, '-password'); // Excluir la contraseña por seguridad
     res.status(200).json(usuarios);
   } catch (error) {
     console.error(error);
@@ -65,12 +64,12 @@ export const obtenerUsuarios = async (req, res) => {
 // Actualizar un usuario por ID
 export const actualizarUsuario = async (req, res) => {
   const { id } = req.params;
-  const { nombre, email, imagenPerfil } = req.body;
+  const { name, email, imageProfile } = req.body; // Cambio a los campos solicitados
 
   try {
     const usuarioActualizado = await User.findByIdAndUpdate(
       id,
-      { nombre, email, imagenPerfil },
+      { name, email, imageProfile }, // Cambio de 'nombre' por 'name' y 'imagenPerfil' por 'imageProfile'
       { new: true, runValidators: true } // Retorna el documento actualizado y aplica validaciones
     );
 
