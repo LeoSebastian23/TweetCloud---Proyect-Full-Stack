@@ -20,7 +20,7 @@ export const crearPublicacion = async (req, res) => {
 
     // Crear la publicación
     const newPost = new Post({
-      title,
+      title: "",
       body,
       autor,
     });

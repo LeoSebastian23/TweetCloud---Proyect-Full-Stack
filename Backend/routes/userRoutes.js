@@ -5,7 +5,9 @@ import {
   obtenerUsuarios,
   actualizarUsuario,
   eliminarUsuario,
+  getUserProfile,
 } from '../controllers/userController.js';
+import { verificarToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -14,6 +16,7 @@ router.post('/login', loginUsuario);
 router.get('/', obtenerUsuarios); 
 router.put('/:id', actualizarUsuario); 
 router.delete('/:id', eliminarUsuario); 
+router.get('/profile', verificarToken, getUserProfile );
 
 export default router;
 

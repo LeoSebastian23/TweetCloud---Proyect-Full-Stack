@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Bell, Home, LogOut, Settings, User } from "lucide-react";
-import NavItem from "./NavItem";
+import NavItem from "../dashboard/NavItem";
 
 interface ProfileSectionProps {
   user: {

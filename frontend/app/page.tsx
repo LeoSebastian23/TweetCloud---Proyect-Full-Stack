@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Cloud, MessageSquare, Users, Zap } from "lucide-react";
 import LoginForm from "./components/loginForm";
 import AnimatedSVG from "./components/AnimatedSVG";
+import FeatureCard from "./components/featuredCard";
 
 export default function HomePage() {
   return (
@@ -67,24 +68,3 @@ export default function HomePage() {
   );
 }
 
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-shadow">
-      <div className="text-[var(--mountain-meadow-500)] dark:text-[var(--mountain-meadow-400)] mb-2 md:mb-4">
-        {icon}
-      </div>
-      <h3 className="text-lg md:text-xl font-semibold mb-2 text-[var(--mountain-meadow-600)] dark:text-[var(--mountain-meadow-400)]">
-        {title}
-      </h3>
-      <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
-        {description}
-      </p>
-    </div>
-  );
-}

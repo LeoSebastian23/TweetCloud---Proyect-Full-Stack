@@ -150,7 +150,7 @@ export default function RegisterPage() {
         <div className="text-sm text-center text-mountainMeadow-700 dark:text-mountainMeadow-300 p-2">
           Already have an account?{" "}
           <Link
-            href="/login"
+            href="/"
             className="text-mountainMeadow-100 dark:text-mountainMeadow-100 hover:underline"
           >
             Sign in

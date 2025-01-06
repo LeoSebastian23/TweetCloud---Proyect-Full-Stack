@@ -69,6 +69,23 @@ export const loginUsuario = async (req, res) => {
   }
 };
 
+export const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId; // Obtén el `userId` del token decodificado
+
+    const user = await User.findById(userId).select("-password"); // Busca al usuario sin incluir la contraseña
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user); // Responde con los datos del usuario
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 // Obtener todos los usuarios
 export const obtenerUsuarios = async (req, res) => {
   try {
@@ -88,8 +105,8 @@ export const actualizarUsuario = async (req, res) => {
   try {
     const usuarioActualizado = await User.findByIdAndUpdate(
       id,
-      { name, email, imageProfile }, // Cambio de 'nombre' por 'name' y 'imagenPerfil' por 'imageProfile'
-      { new: true, runValidators: true } // Retorna el documento actualizado y aplica validaciones
+      { name, email, imageProfile }, 
+      { new: true, runValidators: true }
     );
 
     if (!usuarioActualizado) {

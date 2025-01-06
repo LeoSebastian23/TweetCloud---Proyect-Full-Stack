@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ProfileSection from "../dashboard/ProfileSection";
+import ProfileSection from "./ProfileSection";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);

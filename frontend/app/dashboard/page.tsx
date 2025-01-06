@@ -1,36 +1,33 @@
 'use client';
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PostFeed from "./PostFeed";
-import ProfileSection from "./ProfileSection"; // Asegúrate de que ProfileSection esté importado
+import ProfileSection from "../profile/ProfileSection";
+import NewPostForm from "./NewPostForm";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Agrega un estado de carga
-  const [error, setError] = useState(null); // Agrega un estado de error
+  const [user, setUser] = useState<{ _id: string; name: string; imageProfile: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [posts, setPosts] = useState([]); // Estado para las publicaciones
 
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        setLoading(false); // Si no hay token, dejamos de cargar
+        setLoading(false);
+        setError("User not authenticated");
+        window.location.href = "/login";
         return;
       }
 
       try {
-        const response = await axios.get("http://localhost:5000/user", {
+        const response = await axios.get("http://localhost:5000/user/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.status === 200) {
-          // Filtramos el usuario correcto, por ejemplo, por email o id
-          const loggedInUser = response.data.find((user: any) => user.email === "juan.perez@example.com"); // Aquí deberías usar el email del usuario logueado
-          if (loggedInUser) {
-            setUser(loggedInUser); // Establece el usuario logueado
-          } else {
-            setError("User not found");
-          }
+          setUser(response.data); // Guarda los datos del usuario logueado
         } else {
           setError("Failed to fetch user data");
         }
@@ -38,19 +35,24 @@ export default function DashboardPage() {
         setError("An error occurred while fetching user data");
         console.error("Error fetching user:", error);
       } finally {
-        setLoading(false); // Cambia el estado de carga a false después de intentar obtener los datos
+        setLoading(false);
       }
     };
 
     fetchUser();
   }, []);
 
+  // Función para agregar una nueva publicación al estado
+  const handleNewPost = (newPost) => {
+    setPosts([newPost, ...posts]); // Añadir la nueva publicación al inicio del feed
+  };
+
   if (loading) {
     return <div className="text-center">Loading profile...</div>;
   }
 
   if (error) {
-    return <div className="text-center text-red-500">{error}</div>; // Muestra un error si la solicitud falla
+    return <div className="text-center text-red-500">{error}</div>;
   }
 
   return (
@@ -65,14 +67,18 @@ export default function DashboardPage() {
 
           {/* Main Content Section */}
           <main className="w-full md:w-9/12">
+            {/* Formulario para nueva publicación */}
+            <NewPostForm onPostCreated={handleNewPost} user={user} />
+
             {/* Post Feed */}
-            <PostFeed />
+            <PostFeed posts={posts} />
           </main>
         </div>
       </div>
     </div>
   );
 }
+
 
 
 

@@ -34,7 +34,7 @@ export default function LoginForm() {
         <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg">
           <div className="text-center p-4">
             <div className="flex items-center justify-center">
-              <h2 className="text-3xl ml-2 text-mountainMeadow-600 dark:text-mountainMeadow-200">
+              <h2 className="text-4xl ml-2 text-mountainMeadow-600 dark:text-mountainMeadow-500">
                 Welcome
               </h2>
             </div>
