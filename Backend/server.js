@@ -4,7 +4,7 @@ import cors from 'cors';
 import { connectDB } from './config/db.js';
 import { userRouter } from './routes/UserRoutes.js';
 import { postRouter } from './routes/postRoutes.js';
-
+import crypto from 'crypto'
 
 dotenv.config(); // Carga las variables de entorno
 connectDB();     // Conecta a MongoDB

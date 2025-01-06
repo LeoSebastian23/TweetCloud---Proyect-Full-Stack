@@ -10,19 +10,23 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:5000/user/login", { email, password });
-      if (response.status === 200) {
-        router.push("/dashboard"); // Redirige al dashboard
-      } else {
-        console.error("Login failed: ", response.data.message);
-      }
-    } catch (error) {
-      console.error("An error occurred during login:", error);
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:5000/user/login", { email, password });
+    if (response.status === 200) {
+      // Guarda el token en localStorage
+      localStorage.setItem("token", response.data.token);
+      router.push("/dashboard"); // Redirige al dashboard
+    } else {
+      console.error("Login failed: ", response.data.message);
     }
-  };
+  } catch (error) {
+    console.error("An error occurred during login:", error);
+  }
+};
+
   const goBack = () => {
     router.back(); // Llama al método back() para ir a la página anterior
   };

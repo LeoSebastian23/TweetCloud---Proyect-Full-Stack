@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // Crear un nuevo usuario
 export const crearUsuario = async (req, res) => {
@@ -27,9 +28,10 @@ export const crearUsuario = async (req, res) => {
 
 // Autenticación (login) de un usuario
 export const loginUsuario = async (req, res) => {
-  const { email, password } = req.body; // Cambio a 'password'
+  const { email, password } = req.body;
 
   try {
+    // Buscar al usuario por su correo electrónico
     const usuario = await User.findOne({ email });
 
     if (!usuario) {
@@ -37,13 +39,30 @@ export const loginUsuario = async (req, res) => {
     }
 
     // Verificar la contraseña
-    const esValido = await bcrypt.compare(password, usuario.password); // Cambiar 'contraseña' por 'password'
+    const esValido = await bcrypt.compare(password, usuario.password);
 
     if (!esValido) {
       return res.status(400).json({ error: 'Contraseña incorrecta' });
     }
 
-    res.status(200).json({ mensaje: 'Autenticación exitosa', usuario });
+    // Generar un JWT
+    const token = jwt.sign(
+      { userId: usuario._id }, // Payload: información del usuario
+      process.env.JWT_SECRET_KEY, // Clave secreta para firmar el token
+      { expiresIn: '1h' } // El token expirará en 1 hora
+    );
+
+    // Responder con el token y los datos del usuario
+    res.status(200).json({
+      mensaje: 'Autenticación exitosa',
+      usuario: {
+        id: usuario._id,
+        name: usuario.name,
+        email: usuario.email,
+        imageProfile: usuario.imageProfile || '/default-profile.png', // Si tiene imagen de perfil
+      },
+      token, // El token JWT generado
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Hubo un error al iniciar sesión' });
