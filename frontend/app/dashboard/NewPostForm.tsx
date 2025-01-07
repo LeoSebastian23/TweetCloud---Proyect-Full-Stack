@@ -4,40 +4,49 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-// Define los tipos de los props
-interface NewPostFormProps {
-  onPostCreated: (post: { body: string; _id: string }) => void; // El post debe tener body y _id
-  user: {
-    _id: string;  // El user debe tener un _id
-    name: string;
-    imageProfile: string;
+interface Post {
+  _id: string;
+  body: string;
+  autor: {
+    nombre: string;
+    imagenPerfil: string;
   };
-}  
+  createdAt: string;
+}
 
-// Especifica el tipo de los props en el componente
+interface NewPostFormProps {
+  onPostCreated: (post: Post) => void;
+  user: {
+    _id: string;
+    name: string;
+    imageProfile?: string;
+  };
+}
+
 export default function NewPostForm({ onPostCreated, user }: NewPostFormProps) {
-  const [postText, setPostText] = useState<string>("");  // El estado debe tener tipo string
-  const [loading, setLoading] = useState<boolean>(false);  // El estado debe tener tipo booleano
-  const [error, setError] = useState<string>("");  // El estado de error debe ser string
+  const [postText, setPostText] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>(""); // Para mensajes de éxito
   const router = useRouter();
 
-  // El tipo del evento en el cambio de texto debe ser React.ChangeEvent<HTMLTextAreaElement>
+  const MAX_CHAR_COUNT = 280;
+
   const handlePostTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPostText(e.target.value);
+    if (e.target.value.length <= MAX_CHAR_COUNT) {
+      setPostText(e.target.value);
+    }
   };
 
-  // Cambiar el tipo de evento a FormEvent<HTMLFormElement>
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Esto es necesario para prevenir el comportamiento por defecto de un formulario
+    e.preventDefault();
     const token = localStorage.getItem("token");
 
-    // Verificar si hay token y si el usuario está presente
     if (!token || !user) {
       setError("User not authenticated");
       return;
     }
 
-    // Verificar que el texto de la publicación no esté vacío
     if (!postText.trim()) {
       setError("Post content cannot be empty");
       return;
@@ -45,13 +54,13 @@ export default function NewPostForm({ onPostCreated, user }: NewPostFormProps) {
 
     try {
       setLoading(true);
-      setError(""); // Reset error
+      setError("");
 
       const response = await axios.post(
         "http://localhost:5000/post",
         {
           body: postText,
-          autor: user._id, // Asegúrate de que el user tenga un _id
+          autor: user._id,
         },
         {
           headers: {
@@ -61,13 +70,17 @@ export default function NewPostForm({ onPostCreated, user }: NewPostFormProps) {
       );
 
       if (response.status === 201) {
-        onPostCreated(response.data); // Llamamos al callback del dashboard
-        setPostText(""); // Limpiamos el campo del formulario
+        onPostCreated(response.data);
+        setPostText("");
+        setSuccess("Post created successfully!");
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         setError("Failed to create post");
       }
-    } catch (error) {
-      setError("An error occurred while creating the post");
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || "An error occurred while creating the post"
+      );
       console.error("Error creating post:", error);
     } finally {
       setLoading(false);
@@ -75,19 +88,23 @@ export default function NewPostForm({ onPostCreated, user }: NewPostFormProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 mb-6 rounded-lg shadow-lg">
-      <h3> What's on your mind?</h3>
-      <form onSubmit={handleSubmit}>  {/* Usamos onSubmit en el formulario */}
+    <div className="bg-white dark:bg-gray-800 p-4 mb-4 rounded-lg shadow-lg">
+      <h3>What's on your mind?</h3>
+      <form onSubmit={handleSubmit}>
         <textarea
+          aria-label="Write your post"
           placeholder="What's on your mind?"
           value={postText}
           onChange={handlePostTextChange}
-          className="w-full p-2 mt-2 border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
+          className="w-full p-2 mt-1 border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-2"
         />
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {postText.length}/{MAX_CHAR_COUNT}
+        </p>
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="px-6 py-1 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             disabled={loading || !postText.trim()}
           >
             {loading ? "Posting..." : "Post"}
@@ -95,10 +112,8 @@ export default function NewPostForm({ onPostCreated, user }: NewPostFormProps) {
         </div>
       </form>
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {success && <p className="text-green-500 text-sm mt-2">{success}</p>}
     </div>
   );
 }
-
-
-
 

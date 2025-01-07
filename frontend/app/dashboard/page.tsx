@@ -3,13 +3,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import PostFeed from "./PostFeed";
 import ProfileSection from "../profile/ProfileSection";
-import NewPostForm from "./NewPostForm";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<{ _id: string; name: string; imageProfile: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [posts, setPosts] = useState([]); // Estado para las publicaciones
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -27,7 +25,8 @@ export default function DashboardPage() {
         });
 
         if (response.status === 200) {
-          setUser(response.data); // Guarda los datos del usuario logueado
+          const { _id, name, email, imageProfile } = response.data;
+          setUser({ _id, name, email, imageProfile });
         } else {
           setError("Failed to fetch user data");
         }
@@ -41,11 +40,6 @@ export default function DashboardPage() {
 
     fetchUser();
   }, []);
-
-  // Función para agregar una nueva publicación al estado
-  const handleNewPost = (newPost) => {
-    setPosts([newPost, ...posts]); // Añadir la nueva publicación al inicio del feed
-  };
 
   if (loading) {
     return <div className="text-center">Loading profile...</div>;
@@ -62,16 +56,14 @@ export default function DashboardPage() {
       </nav>
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row gap-6">
+
           {/* Profile Section - Mostrar el perfil si hay usuario */}
           {user ? <ProfileSection user={user} /> : <p>No user found</p>}
 
           {/* Main Content Section */}
           <main className="w-full md:w-9/12">
-            {/* Formulario para nueva publicación */}
-            <NewPostForm onPostCreated={handleNewPost} user={user} />
-
             {/* Post Feed */}
-            <PostFeed posts={posts} />
+            <PostFeed user={user} />
           </main>
         </div>
       </div>
@@ -79,8 +71,12 @@ export default function DashboardPage() {
   );
 }
 
-
-
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  imageProfile?: string;
+}
 
 
 

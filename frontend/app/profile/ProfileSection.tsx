@@ -10,7 +10,7 @@ interface ProfileSectionProps {
   };
 }
 
-const ProfileSection: FC<ProfileSectionProps> = ({ user }) => {
+const ProfileSection: FC<ProfileSectionProps> = ({ user }: ProfileSectionProps) => {
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full md:w-3/12">
       <div className="flex items-center space-x-4 mb-6">

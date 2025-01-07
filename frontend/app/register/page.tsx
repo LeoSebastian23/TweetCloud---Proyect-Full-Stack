@@ -15,6 +15,7 @@ export default function RegisterPage() {
   });
   const [message, setMessage] = useState(""); // Estado para el mensaje de éxito/error
   const router = useRouter(); // Inicializa el hook useRouter
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -25,18 +26,31 @@ export default function RegisterPage() {
       if (response.status === 201) {
         setMessage("Registration successful! Redirecting to login...");
         setTimeout(() => {
-          router.push("/login"); // Redirige a la página de login
+          router.push("/"); // Redirige a la página de login
         }, 2000); // Espera 2 segundos antes de redirigir
       } else {
         setMessage("Registration failed: " + response.data.message);
       }
     } catch (error) {
-      setMessage(`An error occurred during registration: ${error.message}`);
+      // Refinar el tipo del error
+      if (axios.isAxiosError(error)) {
+        // Si el error es específico de Axios
+        setMessage(`An error occurred during registration: ${error.response?.data?.message || error.message}`);
+      } else if (error instanceof Error) {
+        // Si es otro tipo de error
+        setMessage(`An unexpected error occurred: ${error.message}`);
+      } else {
+        // Si no se puede determinar el tipo del error
+        setMessage("An unknown error occurred.");
+      }
     }
   };
+  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
   const goBack = () => {
     router.back(); // Llama al método back() para ir a la página anterior
   };
