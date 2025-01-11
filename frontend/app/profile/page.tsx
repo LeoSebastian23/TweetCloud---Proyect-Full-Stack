@@ -5,7 +5,11 @@ import axios from "axios";
 import ProfileSection from "./ProfileSection";
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<{
+    name: string;
+    email: string;
+    imageProfile?: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -43,3 +47,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+

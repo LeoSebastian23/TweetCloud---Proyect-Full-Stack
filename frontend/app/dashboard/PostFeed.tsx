@@ -5,7 +5,6 @@ import axios from "axios";
 import PostCard from "./PostCard";
 import NewPostForm from "./NewPostForm"; // Asegúrate de importar tu formulario de nueva publicación
 
-
 interface User {
   _id: string;
   name: string;
@@ -22,7 +21,6 @@ interface Post {
   body: string;
   createdAt: string;
 }
-
 
 export default function PostFeed({ user }: { user: User | null }) {
   const [posts, setPosts] = useState<Post[]>([]); // Estado para las publicaciones
@@ -50,36 +48,41 @@ export default function PostFeed({ user }: { user: User | null }) {
     },
   ];
 
-const handleNewPost = async (newPost: Post) => {
-  try {
-    // Agrega la nueva publicación al inicio y ordena las publicaciones
-    const updatedPosts = [newPost, ...posts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    setPosts(updatedPosts);
+  const handleNewPost = async (newPost: Post) => {
+    try {
+      // Agrega la nueva publicación al inicio y ordena las publicaciones
+      const updatedPosts = [newPost, ...posts].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
-    // Sincroniza con el backend
-    const response = await axios.get("http://localhost:5000/post");
-    const backendPosts = response.data.map((post: any) => ({
-      _id: post._id,
-      autor: {
-        nombre: post.autor?.nombre || "Anonymous",
-        imagenPerfil: post.autor?.imagenPerfil || "/default-profile.png",
-      },
-      body: post.body || "No content available",
-      createdAt: post.createdAt || new Date().toISOString(),
-    }));
+      // Sincroniza con el backend
+      const response = await axios.get("http://localhost:5000/post");
+      const backendPosts = response.data.map((post: any) => ({
+        _id: post._id,
+        autor: {
+          nombre: post.autor?.nombre || "Anonymous",
+          imagenPerfil: post.autor?.imagenPerfil || "/default-profile.png",
+        },
+        body: post.body || "No content available",
+        createdAt: post.createdAt || new Date().toISOString(),
+      }));
 
-    // Vuelve a ordenar las publicaciones después de sincronizar con el backend
-    const allPosts = [...updatedPosts, ...backendPosts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    setPosts(allPosts);
-  } catch (error) {
-    console.error("Error updating posts:", error);
-  }
-};
-  
+      // Combina y elimina publicaciones duplicadas
+      const uniquePosts = [...updatedPosts, ...backendPosts].filter(
+        (post, index, self) => index === self.findIndex((p) => p._id === post._id)
+      );
+
+      // Vuelve a ordenar las publicaciones
+      uniquePosts.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      setPosts(uniquePosts);
+    } catch (error) {
+      console.error("Error updating posts:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -93,10 +96,17 @@ const handleNewPost = async (newPost: Post) => {
           body: post.body || "No content available",
           createdAt: post.createdAt || new Date().toISOString(),
         }));
+
+        // Combina los datos iniciales con los del backend y elimina duplicados
+        const allPosts = [...defaultPosts, ...backendPosts].filter(
+          (post, index, self) => index === self.findIndex((p) => p._id === post._id)
+        );
+
         // Ordenar las publicaciones por fecha de creación (más recientes primero)
-        const allPosts = [...defaultPosts, ...backendPosts].sort(
+        allPosts.sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
+
         setPosts(allPosts);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -105,10 +115,20 @@ const handleNewPost = async (newPost: Post) => {
       } finally {
         setLoading(false);
       }
-    };    
+    };
     fetchPosts();
   }, []);
-  
+
+  // Log para identificar claves duplicadas (opcional para depuración)
+  useEffect(() => {
+    const duplicatedKeys = posts
+      .map((post) => post._id)
+      .filter((id, index, self) => self.indexOf(id) !== index);
+
+    if (duplicatedKeys.length > 0) {
+      console.error("Duplicated keys found:", duplicatedKeys);
+    }
+  }, [posts]);
 
   if (loading) {
     return (
@@ -135,15 +155,19 @@ const handleNewPost = async (newPost: Post) => {
         ) : (
           <p>Please log in to post.</p>
         )}
-        
+
         <div className="space-y-4 mt-6">
-          {posts.map((post) => (
+          {posts.map((post, index) => (
             <PostCard
-              key={post._id}
+              key={`${post._id}-${index}`} // Combina el ID con el índice para garantizar unicidad
               author={post.autor?.nombre || "Anonymous"}
               avatar={post.autor?.imagenPerfil || "/default-profile.png"}
               content={post.body || "No content available"}
-              timestamp={post.createdAt ? new Date(post.createdAt).toLocaleString() : "Unknown time"}
+              timestamp={
+                post.createdAt
+                  ? new Date(post.createdAt).toLocaleString()
+                  : "Unknown time"
+              }
             />
           ))}
         </div>
@@ -151,4 +175,5 @@ const handleNewPost = async (newPost: Post) => {
     </div>
   );
 }
+
 

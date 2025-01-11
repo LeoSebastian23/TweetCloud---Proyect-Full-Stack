@@ -1,8 +1,9 @@
-'use client';
+"use client";
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PostFeed from "./PostFeed";
-import ProfileSection from "../profile/ProfileSection";
+import NavHeader from "./NavHeader";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -50,23 +51,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <nav className="bg-white dark:bg-gray-800 p-4 shadow-md">
-        {/* Tu barra de navegación */}
-      </nav>
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row gap-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {/* NavHeader Section */}
+      <NavHeader user={user || { name: "Guest", email: "guest@example.com", imageProfile: "/default-profile.png" }} />
 
-          {/* Profile Section - Mostrar el perfil si hay usuario */}
-          {user ? <ProfileSection user={user} /> : <p>No user found</p>}
-
-          {/* Main Content Section */}
-          <main className="w-full md:w-9/12">
-            {/* Post Feed */}
-            <PostFeed user={user} />
-          </main>
-        </div>
-      </div>
+      {/* Main Content Section */}
+      <main className="flex-grow container mx-auto px-4 py-6">
+        <PostFeed user={user} />
+      </main>
     </div>
   );
 }
