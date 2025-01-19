@@ -1,6 +1,9 @@
+"use client";
+
 import { FC } from "react";
 import { Bell, Home, LogOut, Settings, User } from "lucide-react";
 import NavItem from "../dashboard/NavItem";
+import { usePathname } from "next/navigation";
 
 interface NavHeaderProps {
   user: {
@@ -11,6 +14,8 @@ interface NavHeaderProps {
 }
 
 const NavHeader: FC<NavHeaderProps> = ({ user }: NavHeaderProps) => {
+  const pathname = usePathname();
+
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-lg w-full p-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -32,11 +37,30 @@ const NavHeader: FC<NavHeaderProps> = ({ user }: NavHeaderProps) => {
 
         {/* Links de navegación */}
         <div className="flex space-x-6">
-          <NavItem icon={<Home className="h-5 w-5" />} label="Home" active />
-          <NavItem icon={<User className="h-5 w-5" />} label="Profile" />
-          <NavItem icon={<Settings className="h-5 w-5" />} label="Settings" />
-          <NavItem icon={<Bell className="h-5 w-5" />} label="Notifications" />
-          <NavItem icon={<LogOut className="h-5 w-5" />} label="Logout" />
+          <NavItem
+            icon={<Home className="h-5 w-5" />}
+            label="Home"
+            href="/"
+            active={pathname === "/"}
+          />
+          <NavItem
+            icon={<User className="h-5 w-5" />}
+            label="Profile"
+            href="/profile"
+            active={pathname === "/profile"}
+          />
+          <NavItem
+            icon={<Bell className="h-5 w-5" />}
+            label="Notifications"
+            href="/notifications"
+            active={pathname === "/profile"}
+          />
+          <NavItem
+            icon={<LogOut className="h-5 w-5" />}
+            label="Logout"
+            href="/"
+            active={pathname === "/logout"}
+          />
         </div>
       </div>
     </nav>
@@ -44,4 +68,5 @@ const NavHeader: FC<NavHeaderProps> = ({ user }: NavHeaderProps) => {
 };
 
 export default NavHeader;
+
 

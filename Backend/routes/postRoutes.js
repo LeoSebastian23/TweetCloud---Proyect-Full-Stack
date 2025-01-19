@@ -1,12 +1,25 @@
 import express from 'express';
-import { crearPublicacion, obtenerPublicaciones, obtenerPublicacionPorId, editarPublicacion, eliminarPublicacion } from '../controllers/postController.js';
-import { verificarToken } from '../middleware/auth.js';
+import { 
+  crearPublicacion, 
+  obtenerPublicaciones, 
+  obtenerPublicacionPorId, 
+  editarPublicacion, 
+  eliminarPublicacion, 
+  eliminarPublicaciones 
+} from '../controllers/postController.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
 
-router.post('/', verificarToken, crearPublicacion);
-router.get('/', obtenerPublicaciones);
-router.get('/:id', obtenerPublicacionPorId);
-router.put('/:id', editarPublicacion);
-router.delete('/:id', eliminarPublicacion);
+// Rutas públicas o protegidas
+router.get('/', obtenerPublicaciones); // Obtener todas las publicaciones
+router.get('/:id', obtenerPublicacionPorId); // Obtener una publicación por ID
 
-export {router as postRouter}; 
+// Rutas protegidas 
+router.post('/', authMiddleware, crearPublicacion); // Crear publicación
+router.put('/:id', authMiddleware, editarPublicacion); // Editar publicación por ID
+router.delete('/:id', authMiddleware, eliminarPublicacion); // Eliminar publicación por ID
+router.delete('/', authMiddleware, eliminarPublicaciones); // Eliminar todas las publicaciones
+
+export { router as postRouter };
+

@@ -7,17 +7,18 @@ import {
   eliminarUsuario,
   getUserProfile,
 } from '../controllers/userController.js';
-import { verificarToken } from "../middleware/auth.js";
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/register', crearUsuario);
-router.post('/login', loginUsuario);
-router.get('/', obtenerUsuarios); 
-router.put('/:id', actualizarUsuario); 
-router.delete('/:id', eliminarUsuario); 
-router.get('/profile', verificarToken, getUserProfile );
+// Rutas públicas
+router.post('/register', crearUsuario); // Registrar usuario
+router.post('/login', loginUsuario); // Login de usuario
 
-export default router;
+// Rutas protegidas 
+router.get('/', authMiddleware, obtenerUsuarios); // Obtener todos los usuarios (solo admin o autorizado)
+router.get('/profile', authMiddleware, getUserProfile); // Obtener el perfil del usuario autenticado
+router.put('/:id', authMiddleware, actualizarUsuario); // Actualizar un usuario por ID
+router.delete('/:id', authMiddleware, eliminarUsuario); // Eliminar un usuario por ID
 
-export {router as userRouter}; 
+export { router as userRouter };

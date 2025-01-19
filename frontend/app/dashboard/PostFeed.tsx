@@ -15,8 +15,8 @@ interface User {
 interface Post {
   _id: string;
   autor: {
-    nombre: string;
-    imagenPerfil: string;
+    name: string;
+    imageProfile: string;
   };
   body: string;
   createdAt: string;
@@ -27,46 +27,27 @@ export default function PostFeed({ user }: { user: User | null }) {
   const [loading, setLoading] = useState(true); // Estado de carga
   const [error, setError] = useState<string | null>(null); // Estado de error
 
-  const defaultPosts: Post[] = [
-    {
-      _id: "default-1",
-      autor: {
-        nombre: "Jane Smith",
-        imagenPerfil: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      },
-      body: "Just launched my new project! 🚀 #coding #webdev",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      _id: "default-2",
-      autor: {
-        nombre: "Alex Johnson",
-        imagenPerfil: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-      },
-      body: "Beautiful day for coding outside ☀️ #programming",
-      createdAt: new Date().toISOString(),
-    },
-  ];
 
   const handleNewPost = async (newPost: Post) => {
     try {
       // Agrega la nueva publicación al inicio y ordena las publicaciones
       const updatedPosts = [newPost, ...posts].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      );      
 
       // Sincroniza con el backend
       const response = await axios.get("http://localhost:5000/post");
       const backendPosts = response.data.map((post: any) => ({
         _id: post._id,
         autor: {
-          nombre: post.autor?.nombre || "Anonymous",
-          imagenPerfil: post.autor?.imagenPerfil || "/default-profile.png",
+          name: post.autor?.name || "Anonymous",  // Accede a name directamente
+          email: post.autor?.email || "No email",  // Agrega el email si lo necesitas
+          imageProfile: post.autor?.imageProfile || "/default-profile.png",  // Accede a imageProfile
         },
         body: post.body || "No content available",
         createdAt: post.createdAt || new Date().toISOString(),
       }));
-
+      
       // Combina y elimina publicaciones duplicadas
       const uniquePosts = [...updatedPosts, ...backendPosts].filter(
         (post, index, self) => index === self.findIndex((p) => p._id === post._id)
@@ -78,6 +59,7 @@ export default function PostFeed({ user }: { user: User | null }) {
       );
 
       setPosts(uniquePosts);
+      console.log('Posts recibidos:', uniquePosts);
     } catch (error) {
       console.error("Error updating posts:", error);
     }
@@ -90,34 +72,26 @@ export default function PostFeed({ user }: { user: User | null }) {
         const backendPosts = response.data.map((post: any) => ({
           _id: post._id,
           autor: {
-            nombre: post.autor?.nombre || "Anonymous",
-            imagenPerfil: post.autor?.imagenPerfil || "/default-profile.png",
+            name: post.autor?.name || "Anonymous",
+            imageProfile: post.autor?.imageProfile || "/default-profile.png",
           },
           body: post.body || "No content available",
           createdAt: post.createdAt || new Date().toISOString(),
         }));
-
-        // Combina los datos iniciales con los del backend y elimina duplicados
-        const allPosts = [...defaultPosts, ...backendPosts].filter(
-          (post, index, self) => index === self.findIndex((p) => p._id === post._id)
-        );
-
-        // Ordenar las publicaciones por fecha de creación (más recientes primero)
-        allPosts.sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
-        setPosts(allPosts);
+  
+        // Solo se agregan las publicaciones del backend
+        setPosts(backendPosts);
       } catch (error) {
         console.error("Error fetching posts:", error);
         setError("Failed to fetch posts. Please try again later.");
-        setPosts(defaultPosts);
+        setPosts([]); // Si no hay posts, mejor no mostrar nada en lugar de los predeterminados.
       } finally {
         setLoading(false);
       }
     };
     fetchPosts();
   }, []);
+  
 
   // Log para identificar claves duplicadas (opcional para depuración)
   useEffect(() => {
@@ -160,8 +134,8 @@ export default function PostFeed({ user }: { user: User | null }) {
           {posts.map((post, index) => (
             <PostCard
               key={`${post._id}-${index}`} // Combina el ID con el índice para garantizar unicidad
-              author={post.autor?.nombre || "Anonymous"}
-              avatar={post.autor?.imagenPerfil || "/default-profile.png"}
+              author={post.autor?.name || "Anonymous"}
+              avatar={post.autor?.imageProfile || "/default-profile.png"}
               content={post.body || "No content available"}
               timestamp={
                 post.createdAt

@@ -1,14 +1,12 @@
-import React from 'react';
-
 interface PostCardProps {
   author: string;
-
   avatar: string;
   content: string;
   timestamp: string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({ author, avatar, content, timestamp }) => {
+  console.log('PostCard props:', { author, avatar, content, timestamp });
   return (
     <div className="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg">
       <div className="flex items-center space-x-4 mb-4">
@@ -26,6 +24,7 @@ const PostCard: React.FC<PostCardProps> = ({ author, avatar, content, timestamp 
 };
 
 export default PostCard;
+
 
 
   

@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Crear un nuevo usuario
 export const crearUsuario = async (req, res) => {
@@ -48,7 +50,7 @@ export const loginUsuario = async (req, res) => {
     // Generar un JWT
     const token = jwt.sign(
       { userId: usuario._id }, // Payload: información del usuario
-      process.env.JWT_SECRET_KEY, // Clave secreta para firmar el token
+      process.env.JWT_SECRET, // Clave secreta para firmar el token
       { expiresIn: '1h' } // El token expirará en 1 hora
     );
 
